@@ -1,0 +1,33 @@
+{
+  "name": "umaritimus-mssql",
+  "version": "0.1.0",
+  "author": "umaritimus",
+  "summary": "Puppet module to install and manage Microsoft SQL Server",
+  "license": "MIT",
+  "source": "https://github.com/umaritimus/mssql.git",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.13.1 < 6.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "windows",
+      "operatingsystemrelease": [
+        "2016",
+        "2019",
+        "10"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.7.0 < 6.0.0"
+    }
+  ],
+  "pdk-version": "1.7.0",
+  "template-url": "file://C:/Program Files/Puppet Labs/DevelopmentKit/share/cache/pdk-templates.git",
+  "template-ref": "1.7.0-0-g57412ed"
+}

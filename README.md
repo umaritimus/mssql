@@ -8,6 +8,7 @@
     * [Setup requirements](#setup-requirements)
     * [Beginning with mssql](#beginning-with-mssql)
 3. [Usage - Configuration options and additional functionality](#usage)
+3. [Changelog - what's new](#changelog)
 4. [Limitations - OS compatibility, etc.](#limitations)
 
 ## Description
@@ -36,17 +37,43 @@ Define requirements in hiera, e.g.:
 
 ## Usage
 
-* Example (when parameters are defined in hiera):
+* Example (installing client when parameters are defined in hiera):
 
-  ```cmd
-  puppet apply -e "include ::mssql::client"
-  ```
+```cmd
 
-* Example (when used as defined type):
+puppet apply -e "include ::mssql::client"
 
-  ```text
-  puppet apply -e "mssql::client::odbc::driver { 'ODBC Driver 17 for SQL Server' : ensure => 'present', driver => 'ODBC Driver 17 for SQL Server', source => 'c:/temp/msodbcsql_17.3.1.1_x64.msi',  }"
-  ```
+```
+
+* Example (installing OdbcDriver, when used as defined type):
+
+```cmd
+
+puppet apply -e "mssql::client::odbc::driver { 'ODBC Driver 17 for SQL Server' : ensure => 'present', driver => 'ODBC Driver 17 for SQL Server', source => 'c:/temp/msodbcsql_17.3.1.1_x64.msi',  }"
+  
+```
+
+* Example (Installing sqlcmd )
+
+> _Note:_ `Microsoft Command Line Utilities for SQL Server` package has a prerequisite of `Microsoft ODBC Driver` and a modern `.NET` libraries to be already installed
+
+```cmd
+
+puppet apply -e "mssql::client::cli::sqlcmd { 'Remove sqlcmd' : package => 'Microsoft Command Line Utilities 15 for SQL Server', ensure => 'present', source => 'c:/temp/MsSqlCmdLnUtils.msi', }"
+  
+```
+
+* Example (uninstalling sqlcmd )
+
+```cmd
+
+puppet apply -e "mssql::client::cli::sqlcmd { 'Remove sqlcmd' : package => 'Microsoft Command Line Utilities 15 for SQL Server', ensure => 'absent', source => 'c:/temp/MsSqlCmdLnUtils.msi', }"
+  
+```
+
+## Changelog
+
+For updates please see the [changelog](CHANGELOG.md)
 
 ## Limitations
 

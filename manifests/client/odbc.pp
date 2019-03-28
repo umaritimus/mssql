@@ -15,8 +15,11 @@
 #   include mssql::client::odbc
 #
 class mssql::client::odbc (
-  Enum['ODBC Driver 13 for SQL Server','ODBC Driver 17 for SQL Server'] $drivername,
-  String $driversource,
+  Enum[
+    'ODBC Driver 13 for SQL Server',
+    'ODBC Driver 17 for SQL Server'
+  ] $drivername = 'ODBC Driver 17 for SQL Server',
+  String $driversource = 'c:/temp/msodbcsql_17.3.1.1_x64.msi',
   String $driverensure = $mssql::client::ensure,
 ) {
 

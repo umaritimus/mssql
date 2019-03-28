@@ -192,11 +192,30 @@ git push origin
 
 ```cmd
 
+pdk validate --parallel
+pdk test unit --parallel
 pdk build
 
 ```
 
 1. Publish a module [Puppet Forge](https://forge.puppet.com/upload)
+
+## Updating the module on puppet forge
+
+1. Plan the changes
+1. Increment the version of the module in `.\mssql\metadata.json`
+
+```json
+
+...
+  "version": "0.2.0",
+...
+
+```
+
+1. Note changes in `.\mssql\CHANGELOG.md`
+1. Rebuild module
+1. Republish the module with the new version
 
 > _Note:_ the tarball is generated in the previous step, e.g. in `.\mssql\pkg\umaritimus-mssql-0.1.0.tar.gz`
 
@@ -206,15 +225,16 @@ pdk build
 
 ```cmd
 
+# base sql client functionality
+pdk new class mssql::client::cli
+pdk new class mssql::client::api
 pdk new defined_type mssql::client::cli::sqlcmd
 pdk new defined_type mssql::client::cli::sqlscript
 pdk new defined_type mssql::client::cli::sqlquery
 pdk new defined_type mssql::client::api::smo
-pdk new class mssql::client::cli
-pdk new class mssql::client::api
 pdk new defined_type mssql::client::odbc::datasource
 
-# and of course
+# and of course sqlserver
 pdk new class mssql::server
 
 ```

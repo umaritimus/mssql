@@ -188,7 +188,17 @@ git push origin
 
 ## Publish the module to puppet forge
 
-1. Optional
+1. Build the puppet module
+
+```cmd
+
+pdk build
+
+```
+
+1. Publish a module [Puppet Forge](https://forge.puppet.com/upload)
+
+> _Note:_ the tarball is generated in the previous step, e.g. in `.\mssql\pkg\umaritimus-mssql-0.1.0.tar.gz`
 
 ## Appendix
 

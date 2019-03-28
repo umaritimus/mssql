@@ -3,3 +3,7 @@ mssql::client::ensure: 'present'
 mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
 mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
 mssql::client::odbc::driverensure: "%{lookup('mssql::client::ensure')}"
+
+mssql::client::cli::cliname: 'Microsoft Command Line Utilities 15 for SQL Server'
+mssql::client::cli::clisource: 'c:/temp/MsSqlCmdLnUtils.msi'
+mssql::client::cli::cliensure: "%{lookup('mssql::client::ensure')}"

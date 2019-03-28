@@ -132,7 +132,7 @@ mssql::client::odbc::driversource: '//real/location/msodbcsql_17.3.1.1_x64.msi'
 
 ## Register dependencies
 
-1. .\mssql\metadata.json
+1. Add values to `.\mssql\metadata.json`
 
 ```json
 
@@ -161,7 +161,7 @@ pdk test unit --parallel
 ## Publish the module to github
 
 1. Create github repository [umaritimus/mssql.git](https://github.com/umaritimus/mssql.git)
-1. Register source and summary in .\mssql\metadata.json
+1. Register source and summary in `.\mssql\metadata.json`
 
 ```json
 

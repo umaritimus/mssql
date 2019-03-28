@@ -5,6 +5,8 @@
   "summary": "Puppet module to install and manage Microsoft SQL Server",
   "license": "MIT",
   "source": "https://github.com/umaritimus/mssql.git",
+  "project_page": "https://github.com/umaritimus/mssql",
+  "issues_url": "https://github.com/umaritimus/mssql/issues",
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",

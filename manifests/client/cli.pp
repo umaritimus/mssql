@@ -23,8 +23,8 @@ class mssql::client::cli (
 ) {
 
   mssql::client::cli::sqlcmd { $cliname :
-    ensure => $cliensure,
+    ensure  => $cliensure,
     package => $cliname,
-    source => $clisource,
+    source  => $clisource,
   }
 }

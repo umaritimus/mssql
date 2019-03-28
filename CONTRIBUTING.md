@@ -1,158 +1,190 @@
 # Creating a puppet module
 
+## Install pdk
+
+1. *TBD*
+
 ## Develop a module
 
 1. Create module
 
-    ```cmd
-    pdk new module mssql
-    cd .\mssql
-    ```
+```cmd
 
-1. Create classes
+pdk new module mssql
+cd .\mssql
 
-    ```cmd
-    pdk new class mssql::client
-    pdk new class mssql::client::odbc
-    pdk new defined_type mssql::client::odbc::driver
-    ```
+```
 
-1. .\mssql\client\odbc\driver.pp
+1. Create classes and defined types
 
-    ```puppet
-    define mssql::client::odbc::driver(
-        String $driver = $mssql::client::odbc::drivername,
-        String $ensure = $mssql::client::odbc::driverensure,
-        String $source = $mssql::client::odbc::driversource,
-    ) {
+```cmd
 
-        if ($facts['operatingsystem'] == 'windows') {
+pdk new class mssql::client
+pdk new class mssql::client::odbc
+pdk new defined_type mssql::client::odbc::driver
 
-            package { "Microsoft ${driver}" :
-            ensure          => $ensure,
-            source          => $source,
-            install_options => [ { 'ADDLOCAL' => 'All' }, { 'IACCEPTMSODBCSQLLICENSETERMS' => 'YES' } ],
-            provider        => 'windows',
-            }
+```
 
-        } else {
+1. Code `.\mssql\client\odbc\driver.pp`
 
-            warn ('Only windows operating system is currently supported, please somebody add `yum`|`apt` sections')
+```puppet
 
+define mssql::client::odbc::driver(
+    String $driver = $mssql::client::odbc::drivername,
+    String $ensure = $mssql::client::odbc::driverensure,
+    String $source = $mssql::client::odbc::driversource,
+) {
+    if ($facts['operatingsystem'] == 'windows') {
+        package { "Microsoft ${driver}" :
+        ensure          => $ensure,
+        source          => $source,
+        install_options => [ { 'ADDLOCAL' => 'All' }, { 'IACCEPTMSODBCSQLLICENSETERMS' => 'YES' } ],
+        provider        => 'windows',
         }
+    } else {
+        warn ('Only windows operating system is currently supported, please somebody add `yum`|`apt` sections')
     }
-    ```
+}
 
-1. .\mssql\client\odbc.pp
+```
 
-    ```puppet
-    class mssql::client::odbc (
-        Enum['ODBC Driver 13 for SQL Server','ODBC Driver 17 for SQL Server'] $drivername,
-        String $driversource,
-        String $driverensure = 'present',
-    ) {
+1. Code `.\mssql\client\odbc.pp`
 
-        mssql::client::odbc::driver { $drivername :
-            driver => $drivername,
-            ensure => $driverensure,
-            source => $driversource,
-        }
+```puppet
+
+class mssql::client::odbc (
+    Enum['ODBC Driver 13 for SQL Server','ODBC Driver 17 for SQL Server'] $drivername,
+    String $driversource,
+    String $driverensure = 'present',
+) {
+    mssql::client::odbc::driver { $drivername :
+        driver => $drivername,
+        ensure => $driverensure,
+        source => $driversource,
     }
-    ```
+}
 
-1. .\mssql\client.pp
+```
 
-    ```puppet
-    class mssql::client (
-        String $ensure = 'absent'
-    ) {
-        include ::mssql::client::odbc
-    }
-    ```
+1. Code `.\mssql\client.pp`
+
+```puppet
+
+class mssql::client (
+    String $ensure = 'absent'
+) {
+    include ::mssql::client::odbc
+}
+
+```
 
 ## Add module-level data
 
-1. .\mssql\hiera.yaml
+1. Create module data directory
 
-    ```yaml
-    ---
-    version: 5
-    defaults:
-    datadir: data
-    data_hash: yaml_data
-    hierarchy:
-    - name: "common"
-        path: "common.yaml"
-    ```
+```powershell
 
-1. .\mssql\data\common.yaml
+New-Item -Path ".\mssql\data" -Type Directory -Force | Out-Null
 
-    ```yaml
-    ---
-    mssql::client::ensure: 'absent'
-    mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
-    mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
-    mssql::client::odbc::driverensure: "%{lookup('mssql::client::ensure')}"
-    ```
+```
+
+1. Create and values to `.\mssql\hiera.yaml`
+
+```yaml
+
+---
+version: 5
+defaults:
+datadir: data
+data_hash: yaml_data
+hierarchy:
+- name: "common"
+    path: "common.yaml"
+
+```
+
+1. Create and add values to `.\mssql\data\common.yaml`
+
+```yaml
+
+---
+mssql::client::ensure: 'absent'
+mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
+mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
+mssql::client::odbc::driverensure: "%{lookup('mssql::client::ensure')}"
+
+```
 
 ## Add environment-level data
 
-1. ...somewhere in environment hiera
+1. Add values to an existing environment hiera at an appropriate location
 
-    ```yaml
-    ---
-    ...
-    mssql::client::ensure: 'present'
-    mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
-    mssql::client::odbc::driversource: '//real/location/msodbcsql_17.3.1.1_x64.msi'
-    ```
+```yaml
+
+---
+...
+mssql::client::ensure: 'present'
+mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
+mssql::client::odbc::driversource: '//real/location/msodbcsql_17.3.1.1_x64.msi'
+...
+
+```
 
 ## Register dependencies
 
 1. .\mssql\metadata.json
 
-    ```json
-    ...
-    "dependencies": [
-        {
-        "name": "puppetlabs/stdlib",
-        "version_requirement": ">= 4.13.1 < 6.0.0"
-        }
-    ],
-    ...
-    ```
+```json
+
+...
+"dependencies": [
+    {
+    "name": "puppetlabs/stdlib",
+    "version_requirement": ">= 4.13.1 < 6.0.0"
+    }
+],
+...
+
+```
 
 ## Test and validate
 
 1. Ensure there are no errors or warnings
 
-    ```cmd
-    pdk validate --parallel
-    pdk test unit --parallel
-    ```
+```cmd
+
+pdk validate --parallel
+pdk test unit --parallel
+
+```
 
 ## Publish the module to github
 
-1. Create github repository https://github.com/umaritimus/mssql.git
+1. Create github repository [umaritimus/mssql.git](https://github.com/umaritimus/mssql.git)
 1. Register source and summary in .\mssql\metadata.json
 
-    ```json
-    ...
-    "summary": "Puppet module to install and manage Microsoft SQL Server",
-    "source": "https://github.com/umaritimus/mssql.git",
-    ```
+```json
+
+...
+"summary": "Puppet module to install and manage Microsoft SQL Server",
+"source": "https://github.com/umaritimus/mssql.git",
+...
+
+```
 
 1. Describe module in [README.md](README.md)
 
 1. Initialize repository and push
 
-    ```cmd
-    git init
-    git remote add origin https://github.com/umaritimus/mssql.git
-    git add .
-    git commit -m "Initial commit"
-    git push origin
+```cmd
 
+git init
+git remote add origin https://github.com/umaritimus/mssql.git
+git add .
+git commit -m "Initial commit"
+git push origin
+
+```
 
 ## Publish the module to puppet forge
 
@@ -160,14 +192,19 @@
 
 ## Appendix
 
-1. Expand functionality
+1. Expand functionality *TBD*
 
-    ```cmd
-    pdk new defined_type mssql::client::cli::sqlcmd
-    pdk new defined_type mssql::client::cli::sqlscript
-    pdk new defined_type mssql::client::cli::sqlquery
-    pdk new defined_type mssql::client::api::smo
-    pdk new class mssql::client::cli
-    pdk new class mssql::client::api
-    pdk new defined_type mssql::client::odbc::datasource
-    ```
+```cmd
+
+pdk new defined_type mssql::client::cli::sqlcmd
+pdk new defined_type mssql::client::cli::sqlscript
+pdk new defined_type mssql::client::cli::sqlquery
+pdk new defined_type mssql::client::api::smo
+pdk new class mssql::client::cli
+pdk new class mssql::client::api
+pdk new defined_type mssql::client::odbc::datasource
+
+# and of course
+pdk new class mssql::server
+
+```

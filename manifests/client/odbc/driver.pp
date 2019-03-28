@@ -2,12 +2,18 @@
 #
 # @summary Installation and removal of an OdbcDriver
 #
-# @driver Microsoft OdbcDriver name
-# @ensure Standard puppet ensure
-# @source Location of OdbcDriver installation msi
+# @param driver 
+# Microsoft OdbcDriver name
+#
+# @param ensure
+# Standard puppet ensure
+#
+# @param source
+# Location of OdbcDriver installation msi
 #
 # @example
 #   mssql::client::odbc::driver { 'namevar': }
+#
 define mssql::client::odbc::driver (
   String $driver = $mssql::client::odbc::drivername,
   String $ensure = $mssql::client::odbc::driverensure,

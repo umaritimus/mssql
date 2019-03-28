@@ -1,6 +1,9 @@
-# A description of what this class does
+# mssql::client
 #
-# @summary A short summary of the purpose of this class
+# @summary Standard constructor
+#
+# @param ensure
+# Standard puppet ensure, e.g. present, absent, installed, etc
 #
 # @example
 #   include mssql::client

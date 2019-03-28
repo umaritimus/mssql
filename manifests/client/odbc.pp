@@ -1,9 +1,19 @@
-# A description of what this class does
+# mssql::client::odbc
 #
-# @summary A short summary of the purpose of this class
+# @summary Initializes OdbcDriver
+#
+# @param drivername
+# Name of the Microsoft ODBC Driver - has to be exact, hence enumaration
+#
+# @param driversource
+# Location of the downloaded msi installer
+#
+# @param driverensure
+# Standard puppet ensure, e.g. present, absent, installed, etc
 #
 # @example
 #   include mssql::client::odbc
+#
 class mssql::client::odbc (
   Enum['ODBC Driver 13 for SQL Server','ODBC Driver 17 for SQL Server'] $drivername,
   String $driversource,

@@ -13,13 +13,13 @@
 
 ## Description
 
-Puppet module to install and manage Microsoft SQL Server.  So far it's only a demo of OdbcDriver installation, but later will be expanded...
+Puppet module to install and manage Microsoft SQL Server.
 
 ## Setup
 
 ### Setup Requirements
 
-* This module requires `puppetlabs/stdlib` to be present.
+* This module requires `puppetlabs/stdlib` and `puppetlabs/inifile` to be present.
 
 ### Beginning with mssql
 
@@ -33,9 +33,41 @@ Define requirements in hiera, e.g.:
   mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
   ```
 
-  > _Note:_ The ODBCDriver name is fixed.  If you don't specify the correct name, problems will follow you around
+  > _Note:_ The OdbcDriver name is needs to be exact, as identified by Microsoft.  If you don't specify the correct name, problems will follow you around...
 
 ## Usage
+
+* Example (installing/uninstalling SQL Server):
+
+```cmd
+
+puppet apply -e "include ::mssql::server"
+
+```
+
+> _Note:_ Ensure that you are specifying correct parameters for your sql server version.  The settings are stored in mssql::server::install::settings hash.  The values are those that are used in `ConfigurationFile.ini` (why reinvent the wheel). So
+specify the settings that you need for your configuration and the setup will take care of them for you.  However, ensure that your parameter values are properly enclosed in quotes and contain backslashes (in windows), see `INSTANCEDIR` and `SQLSYSADMINACCOUNTS` in the configuration example below
+
+```yaml
+
+---
+mssql::server::source: 'c:/temp/SQLServer2017-x64-ENU-Dev'
+mssql::server::ensure: 'present'
+mssql::server::install::settings:
+  'OPTIONS':
+    'ACTION': "Install"
+    'FEATURES': "SQLENGINE"
+    'INSTANCENAME': "MSSQLSERVER"
+    'INSTANCEDIR': "\"c:\\Program Files\\Microsoft SQL Server\""
+    'QUIET': "True"
+    'IACCEPTSQLSERVERLICENSETERMS': "True"
+    'SQLSYSADMINACCOUNTS': "\"domain\\adminuser1\" \"domain\\adminuser2\" \"domain\\admingroup1\""
+    'INDICATEPROGRESS': "True"
+    'UPDATEENABLED': "False"
+
+```
+
+> _Note:_ To run the uninstall, you can rewrite the `OPTIONS` subhash, but you really don't have to... You can just simply toggle the `mssql::server::ensure:` to `'absent'`.  and rerun the `include ::mssql::server`
 
 * Example (installing client when parameters are defined in hiera):
 
@@ -59,7 +91,7 @@ puppet apply -e "mssql::client::odbc::driver { 'ODBC Driver 17 for SQL Server' :
 
 ```cmd
 
-puppet apply -e "mssql::client::cli::sqlcmd { 'Remove sqlcmd' : package => 'Microsoft Command Line Utilities 15 for SQL Server', ensure => 'present', source => 'c:/temp/MsSqlCmdLnUtils.msi', }"
+puppet apply -e "mssql::client::cli::sqlcmd { 'Add sqlcmd' : package => 'Microsoft Command Line Utilities 15 for SQL Server', ensure => 'present', source => 'c:/temp/MsSqlCmdLnUtils.msi', }"
   
 ```
 

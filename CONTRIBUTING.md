@@ -1,5 +1,7 @@
 # Creating a puppet module
 
+> _Note:_  This is a really a guide about how to start developing a puppet module.  If you want to contribute functionality to the mssql module or fix a bug, please submit an Issue, or better yet a Pull Request...
+
 ## Install pdk
 
 1. *TBD*

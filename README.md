@@ -4,12 +4,12 @@
 #### Table of Contents
 
 1. [Description](#description)
-2. [Setup - The basics of getting started with mssql](#setup)
+1. [Setup - The basics of getting started with mssql](#setup)
     * [Setup requirements](#setup-requirements)
     * [Beginning with mssql](#beginning-with-mssql)
-3. [Usage - Configuration options and additional functionality](#usage)
-3. [Changelog - what's new](#changelog)
-4. [Limitations - OS compatibility, etc.](#limitations)
+1. [Usage - Configuration options and additional functionality](#usage)
+1. [Changelog - what's new](#changelog)
+1. [Limitations - OS compatibility, etc.](#limitations)
 
 ## Description
 
@@ -33,11 +33,11 @@ Define requirements in hiera, e.g.:
   mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
   ```
 
-  > _Note:_ The OdbcDriver name is needs to be exact, as identified by Microsoft.  If you don't specify the correct name, problems will follow you around...
+  > _Note:_ The OdbcDriver name needs to be exact, as defined by Microsoft.  If you don't specify the correct name, problems will follow you around, e.g. during DSN creation...
 
 ## Usage
 
-* Example (installing/uninstalling SQL Server):
+* Example ( Installing/Uninstalling SQL Server ):
 
 ```cmd
 
@@ -45,12 +45,13 @@ puppet apply -e "include ::mssql::server"
 
 ```
 
-> _Note:_ Ensure that you are specifying correct parameters for your sql server version.  The settings are stored in mssql::server::install::settings hash.  The values are those that are used in `ConfigurationFile.ini` (why reinvent the wheel). So
-specify the settings that you need for your configuration and the setup will take care of them for you.  However, ensure that your parameter values are properly enclosed in quotes and contain backslashes (in windows), see `INSTANCEDIR` and `SQLSYSADMINACCOUNTS` in the configuration example below
+> _Note:_ Ensure that you are specifying correct parameters for your sql server version.  The settings are stored in `mssql::server::install::settings` hash.  The values are those that are used in `ConfigurationFile.ini` (why reinvent the wheel). So
+specify the settings that you need for your configuration and the setup will take care of them for you.  Using this methodology guarantees compatibility with all sql server versions that have capabilities of command-line installation. However, ensure that your parameter values are properly enclosed in quotes and contain backslashes (in windows), see `INSTANCEDIR` and `SQLSYSADMINACCOUNTS` in the configuration example below:
 
 ```yaml
 
 ---
+...
 mssql::server::source: 'c:/temp/SQLServer2017-x64-ENU-Dev'
 mssql::server::ensure: 'present'
 mssql::server::install::settings:
@@ -69,7 +70,7 @@ mssql::server::install::settings:
 
 > _Note:_ To run the uninstall, you can rewrite the `OPTIONS` subhash, but you really don't have to... You can just simply toggle the `mssql::server::ensure:` to `'absent'`.  and rerun the `include ::mssql::server`
 
-* Example (installing client when parameters are defined in hiera):
+* Example ( Installing client when parameters are defined in hiera ):
 
 ```cmd
 
@@ -77,7 +78,7 @@ puppet apply -e "include ::mssql::client"
 
 ```
 
-* Example (installing OdbcDriver, when used as defined type):
+* Example ( Installing OdbcDriver, when used as defined type ):
 
 ```cmd
 
@@ -85,7 +86,7 @@ puppet apply -e "mssql::client::odbc::driver { 'ODBC Driver 17 for SQL Server' :
   
 ```
 
-* Example (Installing sqlcmd )
+* Example ( Installing sqlcmd )
 
 > _Note:_ `Microsoft Command Line Utilities for SQL Server` package has a prerequisite of `Microsoft ODBC Driver` and a modern `.NET` libraries to be already installed
 
@@ -95,7 +96,7 @@ puppet apply -e "mssql::client::cli::sqlcmd { 'Add sqlcmd' : package => 'Microso
   
 ```
 
-* Example (uninstalling sqlcmd )
+* Example ( Uninstalling sqlcmd )
 
 ```cmd
 
@@ -105,12 +106,14 @@ puppet apply -e "mssql::client::cli::sqlcmd { 'Remove sqlcmd' : package => 'Micr
 
 ## Changelog
 
-For updates please see the [changelog](CHANGELOG.md)
+For updates please see the [changelog](https://github.com/umaritimus/mssql/blob/master/CHANGELOG.md)
 
 ## Limitations
 
 * Currently this module only works on Microsoft Windows platform.
+* It has only been tested with `Microsoft SQL Server 2017, Developer edition`
+* It has been developed and tested using `Open Source Puppet 5.5.10` and `pdk 1.7.0`
 
 ## Development
 
-Use Pull Requests to contribute code, please!  Please see [description of how this was developed](CONTRIBUTING.md)
+Use Pull Requests to contribute code, please!  Please see [description of how this was developed](https://github.com/umaritimus/mssql/blob/master/CONTRIBUTING.md)

@@ -1,20 +1,10 @@
-# Defined type for SQLCMD
+# @summary A short summary of the purpose of this class
 #
-# @summary Installation and removal of an SQL Server Command Line Utilities
-#
-# @param package 
-# Name of the SQL Server Command Line Utilities package
-#
-# @param ensure
-# Standard puppet ensure
-#
-# @param source
-# Location of SQLCMD installation msi
+# A description of what this class does
 #
 # @example
-#   mssql::client::cli::sqlcmd { 'namevar': }
-#
-define mssql::client::cli::sqlcmd(
+#   include mssql::client::cli::install
+class mssql::client::cli::install (
   String $package = $mssql::client::cli::cliname,
   String $ensure = $mssql::client::cli::cliensure,
   String $source = $mssql::client::cli::clisource,
@@ -35,4 +25,3 @@ define mssql::client::cli::sqlcmd(
 
   }
 }
-

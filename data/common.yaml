@@ -18,7 +18,8 @@ mssql::server::install::settings:
     'INSTANCEDIR': "\"c:\\Program Files\\Microsoft SQL Server\""
     'QUIET': "True"
     'IACCEPTSQLSERVERLICENSETERMS': "True"
-    'SQLSYSADMINACCOUNTS': "\"domain\\adminuser1\" \"domain\\adminuser2\" \"domain\\admingroup1\""
+    'SQLSYSADMINACCOUNTS': "Administrators"
     'INDICATEPROGRESS': "True"
     'UPDATEENABLED': "False"
+    'SAPWD': "Difficult2Guess"
   

@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.4.0
+
+**Breaking Changes**
+
+* Minimum puppet version increased to 5.0.0
+* PDK version set to 1.10.0
+* `mssql::client::cli` class replaced `mssql::client::cli::sqlcmd` defined type
+
+**Added**
+
+* Functionality to execute scripts
+* Instructions for pdk installation
+
 ## Release 0.3.2
 
 **Fixed**

@@ -4,7 +4,8 @@
 
 ## Install pdk
 
-1. *TBD*
+1. Download latest PDK from [puppet](https://puppet.com/download-puppet-development-kit), install and add to path
+
 
 ## Develop a module
 

@@ -1,11 +1,6 @@
 require 'spec_helper'
 
-describe 'mssql::client::cli::sqlcmd' do
-  let(:title) { 'namevar' }
-  let(:params) do
-    {}
-  end
-
+describe 'mssql::client::cli::install' do
   on_supported_os.each do |os, os_facts|
     context "on #{os}" do
       let(:facts) { os_facts }

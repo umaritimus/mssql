@@ -14,5 +14,6 @@ class mssql::client (
   include ::mssql::client::cli
 
   Class[::mssql::client::odbc]
+  -> exec { "wait for odbc" : command => 'Start-Sleep -Seconds 10', provider => 'powershell', }
   -> Class[::mssql::client::cli]
 }

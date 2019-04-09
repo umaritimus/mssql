@@ -1,5 +1,6 @@
 ---
-mssql::client::ensure: 'present'
+mssql::client::ensure: 'absent'
+#mssql::client::ensure: 'present'
 mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
 mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
 mssql::client::odbc::driverensure: "%{lookup('mssql::client::ensure')}"
@@ -21,5 +22,7 @@ mssql::server::install::settings:
     'SQLSYSADMINACCOUNTS': "Administrators"
     'INDICATEPROGRESS': "True"
     'UPDATEENABLED': "False"
+    'SECURITYMODE' : "SQL"
     'SAPWD': "Difficult2Guess"
+    'TCPENABLED': '1'
   

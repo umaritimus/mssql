@@ -1,6 +1,6 @@
 {
   "name": "umaritimus-mssql",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "umaritimus",
   "summary": "Puppet module to install and manage Microsoft SQL Server",
   "license": "MIT",

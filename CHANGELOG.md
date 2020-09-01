@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.5.0
+
+**Added**
+
+* Dependency on `puppetlabs-dsc` module for sql server configuration
+
+## Release 0.4.2
+
+**Fixed**
+
+* Conditional source locations and improved error handling
+
+**Added**
+
+* Placeholder for config class
+
 ## Release 0.4.1
 
 **Added**

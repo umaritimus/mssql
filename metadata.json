@@ -1,6 +1,6 @@
 {
   "name": "umaritimus-mssql",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "author": "umaritimus",
   "summary": "Puppet module to install and manage Microsoft SQL Server",
   "license": "MIT",
@@ -15,6 +15,10 @@
     {
       "name": "puppetlabs/inifile",
       "version_requirement": ">= 4.0.0 < 5.0.0"
+    },
+    {
+      "name": "puppetlabs/dsc",
+      "version_requirement": ">= 1.0.0 < 2.0.0"
     }
   ],
   "operatingsystem_support": [

@@ -8,5 +8,12 @@ class mssql::server (
   String $ensure = 'absent',
   String $source = 'c:/temp/SQLServer2017-x64-ENU-Dev',
 ) {
-  include ::mssql::server::install
+  contain 'mssql::server::install'
+  contain 'mssql::server::update'
+
+  if ($ensure == 'present') {
+    Class['mssql::server::install'] -> Class['mssql::server::update']
+  } else {
+    Class['mssql::server::install']
+  }
 }

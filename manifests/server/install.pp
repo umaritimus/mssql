@@ -1,6 +1,4 @@
-# A description of what this class does
-#
-# @summary A short summary of the purpose of this class
+# @summary Install SQL Server
 #
 # @example
 #   include mssql::server::install
@@ -8,8 +6,10 @@ class mssql::server::install (
   Hash $settings = $mssql::server::install::settings,
   Boolean $logoutput = true,
   Enum['present','absent'] $ensure = $mssql::server::ensure,
-  String $source = $mssql::server::source,
+  String $source = $mssql::server::install::source,
 ) {
+
+  notify { 'Processing mssql::server::install' : }
 
   $configurationfile = "${facts['puppet_vardir']}/ConfigurationFile.ini"
 

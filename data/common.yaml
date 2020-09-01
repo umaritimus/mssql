@@ -8,7 +8,8 @@ mssql::client::cli::cliname: 'Microsoft Command Line Utilities 15 for SQL Server
 mssql::client::cli::clisource: 'c:/temp/MsSqlCmdLnUtils.msi'
 mssql::client::cli::cliensure: "%{lookup('mssql::client::ensure')}"
 
-mssql::server::source: 'c:/temp/SQLServer2017-x64-ENU-Dev'
+mssql::server::install::source: 'c:/temp/SQLServer2019-x64-ENU-Dev'
+mssql::server::update::source: 'c:/temp/SQLServer2019-KB4563110-x64'
 mssql::server::ensure: 'present'
 mssql::server::install::settings:
   'OPTIONS':
@@ -18,7 +19,9 @@ mssql::server::install::settings:
     'INSTANCEDIR': "\"c:\\Program Files\\Microsoft SQL Server\""
     'QUIET': "True"
     'IACCEPTSQLSERVERLICENSETERMS': "True"
+    'SQLCOLLATION': "\"Latin1_General_BIN2\""
     'SQLSYSADMINACCOUNTS': "\"domain\\adminuser1\" \"domain\\adminuser2\" \"domain\\admingroup1\""
     'INDICATEPROGRESS': "True"
     'UPDATEENABLED': "False"
+    'AGTSVCSTARTUPTYPE': "Automatic"
   

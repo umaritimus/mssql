@@ -1,7 +1,5 @@
 # @summary Apply SQL Server cumulative patch
 #
-# Apply SQL Server cumulative patch
-#
 # @example
 #   include mssql::server::update
 class mssql::server::update (
@@ -11,7 +9,12 @@ class mssql::server::update (
 
   notify { 'Processing mssql::server::update' : }
 
-  if (!empty($mssql::server::update::source) and ($ensure == 'present'))  {
+  $source = lookup({
+    'name'          => 'mssql::server::update::source',
+    'default_value' => undef,
+  })
+
+  if (!empty($source) and ($ensure == 'present'))  {
 
     $instancename = lookup({
       'name'          => 'mssql::server::install::settings.OPTIONS.INSTANCENAME',
@@ -21,9 +24,9 @@ class mssql::server::update (
     exec { 'Apply SQL Server Cumulative Update' :
       command  => @("EOT"),
         Try {
-          Set-Location "${regsubst($mssql::server::update::source ,'/', '\\\\', 'G')}"
+          Set-Location "${regsubst($source ,'/', '\\\\', 'G')}"
           Start-Process `
-            -FilePath "${regsubst($mssql::server::update::source ,'/', '\\\\', 'G')}\\setup.exe" `
+            -FilePath "${regsubst($source ,'/', '\\\\', 'G')}\\setup.exe" `
             -ArgumentList "/q /IAcceptSQLServerLicenseTerms /Action=Patch /AllInstances" `
             -Wait `
             -NoNewWindow `
@@ -41,7 +44,7 @@ class mssql::server::update (
         }
         |-EOT
       provider => powershell,
-      onlyif   => @("EOT"),
+      onlyif   => Sensitive(@("EOT")),
         If (
           (Get-ItemProperty `
             -Path 'HKLM:/SOFTWARE/Microsoft/Microsoft SQL Server/Instance Names/SQL' `
@@ -50,6 +53,11 @@ class mssql::server::update (
           0
         } Else {
           Throw 'Instance ${instancename} is not present.'
+        }
+        If (Test-Path -Path "${regsubst($source ,'/', '\\\\', 'G')}\\setup.exe") {
+          0
+        } Else {
+          Throw 'Path for ${source} is invalid.'
         }
         |-EOT
     }

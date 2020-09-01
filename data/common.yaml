@@ -24,4 +24,6 @@ mssql::server::install::settings:
     'INDICATEPROGRESS': "True"
     'UPDATEENABLED': "False"
     'AGTSVCSTARTUPTYPE': "Automatic"
-  
+
+mssql::server::config::settings:
+  'OPTIONS': "%{alias('mssql::server::install::settings.OPTIONS')}"

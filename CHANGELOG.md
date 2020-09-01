@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.4.0
+
+**Fixed**
+
+* PDK 1.18 version dependency
+* `inifile` module dependency
+
+**Added**
+
+* `unless` clause in sql server installation
+
 ## Release 0.3.2
 
 **Fixed**

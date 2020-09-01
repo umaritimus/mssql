@@ -111,8 +111,7 @@ For updates please see the [changelog](https://github.com/umaritimus/mssql/blob/
 ## Limitations
 
 * Currently this module only works on Microsoft Windows platform.
-* It has only been tested with `Microsoft SQL Server 2017, Developer edition`
-* It has been developed and tested using `Open Source Puppet 5.5.10` and `pdk 1.7.0`
+* It has only been tested with `Microsoft SQL Server 2017` and `Microsoft SQL Server 2019`
 
 ## Development
 

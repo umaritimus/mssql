@@ -46,7 +46,7 @@ class mssql::server::install (
 
     validate_legacy(Hash, 'validate_hash', $settings)
     $defaults = { 'path' => $configurationfile, 'key_val_separator' => '=' }
-    create_ini_settings($settings, $defaults)
+    inifile::create_ini_settings($settings, $defaults)
 
     exec { 'Install mssql::server' :
       command   => @("EOT"),
@@ -55,6 +55,17 @@ class mssql::server::install (
         |-EOT
       provider  => 'powershell',
       logoutput => $logoutput,
+      unless    => @("EOT"),
+        If (
+          (Get-ItemProperty `
+            -Path 'HKLM:/SOFTWARE/Microsoft/Microsoft SQL Server/Instance Names/SQL' `
+            -ErrorAction SilentlyContinue `
+          ).${instancename}) {
+          0
+        } Else {
+          Throw 'Instance ${instancename} is already present.'
+        }
+        |-EOT
     }
 
   }

@@ -1,14 +1,12 @@
-# A description of what this class does
-#
-# @summary A short summary of the purpose of this class
+# @summary Base class for installation and configuration of SQL Server
 #
 # @example
 #   include mssql::server
 class mssql::server (
-  String $ensure = 'absent',
-  String $source = 'c:/temp/SQLServer2017-x64-ENU-Dev',
+  Enum['present','absent'] $ensure = 'absent',
 ) {
 
+  notify { 'Processing mssql::server' : }
 
   if ($ensure == 'present') {
 

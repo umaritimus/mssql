@@ -1,0 +1,62 @@
+---
+mssql:
+  server:
+    ensure: 'present'
+    source:
+      install: '//share/software/SQLServer2019-x64-ENU-Enterprise'
+      update : '//share/software/SQLServer2019-KB4563110-x64'
+    instance:
+      action: 'Install'
+      features: 'SQLENGINE'
+      instancedir: 'D:\\microsoft'
+      instancename: 'MSSQLSERVER'
+      sqlcollation: 'Latin1_General_BIN2'
+      securitymode: 'SQL'
+      sapwd: 
+        user: 'sa'
+        password: "%{::random_password}"
+      psdscrunascredential:
+        user: 'domain\psadmin'
+        password: 'TheD0mainPasswrod4psadminUser!'
+      sqlsysadminaccounts:
+        - 'domain\psadmin'
+        - 'NT AUTHORITY\SYSTEM'
+      agtsvcstartuptype: 'Automatic'
+      forcereboot: 'False'
+      suppressreboot: 'True'
+      browsersvcstartuptype: 'Disabled'
+    configuration:
+      - 'backup compression default' : 1
+      - 'cost threshold for parallelism': 60
+      - 'contained database authentication': 1
+      - 'Database Mail XPs': 1
+    login:
+      'sa' :
+        logintype: 'SqlLogin'
+        disabled: 'True'
+      'people' :
+        logintype: 'SqlLogin'
+        logincredential:
+          user: 'people'
+          password: 'peop1e'
+    maxdop : 2
+    tcpport: '1433'
+    memory: 
+      'minmemory': 4096
+      'maxmemory': 4096
+    firewall:
+      allow_remoteaddress:
+        - '10.10.10.0/24'
+      allow_localport:
+        - '1433'
+        - '5022'
+    email:
+      accountname: "PeopleSoft Administrator"
+      profilename: "PeopleSoft Administrator"
+      address: "psadmin@domain.com"
+      replytoaddress: "psadmin@domain.com"
+      displayname: "PeopleSoft Administrator"
+      servername: "smtp.domain.com"
+      description:  "PeopleSoft Administrator"
+      logginglevel: 'Normal'
+      tcpport: 25

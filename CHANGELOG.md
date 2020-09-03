@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.9.5
+
+**Changed**
+
+* Improved documentation
+* Fixed parameter hierarchy
+
+## Release 0.9.1
+
+**Added**
+
+* Condition to indicate that the module only works on Windows
+
+## Release 0.9.0
+
+**Changed**
+
+* Major rewrite of the installation routine using powershell dsc
+module instead of the setup script.
+
 ## Release 0.5.0
 
 **Added**

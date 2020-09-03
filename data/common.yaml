@@ -1,5 +1,8 @@
 ---
-mssql::client::ensure: 'present'
+mssql::server::ensure: "%{lookup('mssql.server.ensure')}"
+
+mssql::client::ensure: 'absent'
+
 mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
 mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
 mssql::client::odbc::driverensure: "%{lookup('mssql::client::ensure')}"
@@ -7,23 +10,3 @@ mssql::client::odbc::driverensure: "%{lookup('mssql::client::ensure')}"
 mssql::client::cli::cliname: 'Microsoft Command Line Utilities 15 for SQL Server'
 mssql::client::cli::clisource: 'c:/temp/MsSqlCmdLnUtils.msi'
 mssql::client::cli::cliensure: "%{lookup('mssql::client::ensure')}"
-
-mssql::server::install::source: 'c:/temp/SQLServer2019-x64-ENU-Dev'
-mssql::server::update::source: 'c:/temp/SQLServer2019-KB4563110-x64'
-mssql::server::ensure: 'present'
-mssql::server::install::settings:
-  'OPTIONS':
-    'ACTION': "Install"
-    'FEATURES': "SQLENGINE"
-    'INSTANCENAME': "MSSQLSERVER"
-    'INSTANCEDIR': "\"c:\\Program Files\\Microsoft SQL Server\""
-    'QUIET': "True"
-    'IACCEPTSQLSERVERLICENSETERMS': "True"
-    'SQLCOLLATION': "\"Latin1_General_BIN2\""
-    'SQLSYSADMINACCOUNTS': "\"domain\\adminuser1\" \"domain\\adminuser2\" \"domain\\admingroup1\""
-    'INDICATEPROGRESS': "True"
-    'UPDATEENABLED': "False"
-    'AGTSVCSTARTUPTYPE': "Automatic"
-
-mssql::server::config::settings:
-  'OPTIONS': "%{alias('mssql::server::install::settings.OPTIONS')}"

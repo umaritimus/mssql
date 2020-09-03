@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.9.6
+
+**Fixed**
+
+* Update dependency definitions
+* Resolved issues
+
 ## Release 0.9.5
 
 **Changed**

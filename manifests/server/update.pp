@@ -36,7 +36,9 @@ class mssql::server::update (
 
             Start-Sleep -Seconds 10
 
-            If ((Get-Content ${regsubst("\'${::env_temp}/sqlserverpatch.log\'", '(/|\\\\)', '\\', 'G')} -ErrorAction Stop) -notlike "*Error*") {
+            If (
+              (Get-Content ${regsubst("\'${::env_temp}/sqlserverpatch.log\'", '(/|\\\\)', '\\', 'G')} -ErrorAction Stop) -notlike "*Error*"
+            ) {
               Exit 0
             } Else {
               Exit 1

@@ -17,9 +17,12 @@ class mssql::server::config {
           dsc_servername                     => 'localhost',
           dsc_instancename                   => lookup('mssql.server.instance.instancename'),
           dsc_logincredential                => lookup({name => "mssql.server.login.${name}.logincredential",default_value => undef,}),
-          dsc_loginmustchangepassword        => lookup({name => "mssql.server.login.${name}.loginmustchangepassword",default_value => 'False',}),
-          dsc_loginpasswordexpirationenabled => lookup({name => "mssql.server.login.${name}.loginpasswordexpirationenabled",default_value => 'False',}),
-          dsc_loginpasswordpolicyenforced    => lookup({name => "mssql.server.login.${name}.loginpasswordpolicyenforced",default_value => 'False',}),
+          dsc_loginmustchangepassword        =>
+            lookup({name => "mssql.server.login.${name}.loginmustchangepassword",default_value => 'False',}),
+          dsc_loginpasswordexpirationenabled =>
+            lookup({name => "mssql.server.login.${name}.loginpasswordexpirationenabled",default_value => 'False',}),
+          dsc_loginpasswordpolicyenforced    =>
+            lookup({name => "mssql.server.login.${name}.loginpasswordpolicyenforced",default_value => 'False',}),
           dsc_disabled                       => lookup({name => "mssql.server.login.${name}.disabled",default_value => 'False',}),
         }
       }

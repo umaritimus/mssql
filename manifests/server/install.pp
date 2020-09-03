@@ -8,7 +8,7 @@ class mssql::server::install (
   Enum['present','absent'] $ensure = lookup('mssql.server.ensure'),
 ) {
 
-  notify { "Processing mssql::server::install" : }
+  notify { 'Processing mssql::server::install' : }
 
   if ($facts['operatingsystem'] == 'windows') {
 

@@ -58,6 +58,12 @@ puppet.bat module install umaritimus-mssql --modulepath ${PuppetCodedir}\product
 ```yaml
 
 ---
+psadmin:
+  name: 'PeopleSoft Administrator'
+  user: 'domain\psadmin'
+  password: 'TheD0mainPasswrod4psadminUser!'
+  email: 'psadmin@domain.com'
+
 mssql:
   server:
     ensure: 'present'
@@ -75,10 +81,10 @@ mssql:
         user: 'sa'
         password: "%{::random_password}"
       psdscrunascredential:
-        user: 'domain\psadmin'
-        password: 'TheD0mainPasswrod4psadminUser!'
+        user: "%{lookup('psadmin.user')}"
+        password: "%{lookup('psadmin.password')}"
       sqlsysadminaccounts:
-        - 'domain\psadmin'
+        - "%{lookup('psadmin.user')}"
         - 'NT AUTHORITY\SYSTEM'
       agtsvcstartuptype: 'Automatic'
       forcereboot: 'False'
@@ -110,15 +116,77 @@ mssql:
         - '1433'
         - '5022'
     email:
-      accountname: "PeopleSoft Administrator"
-      profilename: "PeopleSoft Administrator"
-      address: "psadmin@domain.com"
+      accountname: "%{lookup('psadmin.name')}"
+      profilename: "%{lookup('psadmin.name')}"
+      address: "%{lookup('psadmin.email')}"
       replytoaddress: "psadmin@domain.com"
-      displayname: "PeopleSoft Administrator"
+      displayname: "%{lookup('psadmin.name')}"
       servername: "smtp.domain.com"
-      description:  "PeopleSoft Administrator"
+      description:  "%{lookup('psadmin.name')}"
       logginglevel: 'Normal'
       tcpport: 25
+    security:
+      credentials:
+        "%{lookup('psadmin.user')}":
+          user: "%{lookup('psadmin.user')}"
+          password: "%{lookup('psadmin.password')}"
+    linkedservers:
+      'HRDB':
+        server:    "%{lookup('hr_database_server')}"
+        database:  "HRTST"
+        login:     "%{lookup('hr_linked_username')}"
+        password:  "%{lookup('hr_linked_password')}"
+      'FSDB':
+        server:    "%{lookup('fs_database_server')}"
+        database:  "FSTST"
+        login:     "%{lookup('fs_linked_username')}"
+        password:  "%{lookup('fs_linked_password')}"
+    sqlagent:
+      operators:
+        "%{lookup('psadmin.name')}":
+          name: "%{lookup('psadmin.name')}"
+          email: "%{lookup('psadmin.email')}"
+      alerts:
+        '017':
+          name: '017 - Insufficient Resources'
+          severity: '17'
+          notify: "%{lookup('psadmin.name')}"
+        '018' :
+          name: '018 - Nonfatal Internal Error'
+          severity: '18'
+          notify: "%{lookup('psadmin.name')}"
+        '019':
+          name: '019 - Fatal Error in Resource'
+          severity: '19'
+          notify: "%{lookup('psadmin.name')}"
+        '020' :
+          name: '020 - Fatal Error in Current Process'
+          severity: '20'
+          notify: "%{lookup('psadmin.name')}"
+        '021':
+          name: '021 - Fatal Error in Database Processes'
+          severity: '21'
+          notify: "%{lookup('psadmin.name')}"
+        '022' :
+          name: '022 - Fatal Error: Table Integrity Suspect'
+          severity: '22'
+          notify: "%{lookup('psadmin.name')}"
+        '023':
+          name: '023 - Fatal Error: Database Integrity Suspect'
+          severity: '23'
+          notify: "%{lookup('psadmin.name')}"
+        '024' :
+          name: '024 - Fatal Error: Hardware Error'
+          severity: '24'
+          notify: "%{lookup('psadmin.name')}"
+        '025':
+          name: '025 - Fatal Error'
+          severity: '25'
+          notify: "%{lookup('psadmin.name')}"
+      proxies:
+        "%{lookup('psadmin.user')}":
+          - 'Powershell'
+          - 'CmdExec'
 
 ```
 
@@ -133,7 +201,7 @@ puppet apply -e "include ::mssql::server"
 The output should look similar to:
 
 ```text
-Notice: Compiled catalog for ps-fs-dmo-x81e.lbccd.lbcc.cc.ca.us in environment production in 1.84 seconds
+Notice: Compiled catalog for demo.domain.com in environment production in 1.84 seconds
 Notice: Processing mssql::server
 Notice: /Stage[main]/Mssql::Server/Notify[Processing mssql::server]/message: defined 'message' as 'Processing mssql::server'
 Notice: Processing mssql::server::install
@@ -152,8 +220,37 @@ Notice: /Stage[main]/Mssql::Server::Config/Dsc_sqlserverconfiguration[cost thres
 Notice: /Stage[main]/Mssql::Server::Config/Dsc_sqlserverconfiguration[contained database authentication]/ensure: createdNotice: /Stage[main]/Mssql::Server::Config/Dsc_sqlserverconfiguration[Database Mail XPs]/ensure: created
 Notice: /Stage[main]/Mssql::Server::Config/Dsc_sqlserverdatabasemail[Enable Database Mail]/ensure: created
 Notice: /Stage[main]/Mssql::Server::Config/Dsc_sqlservermaxdop[Set MAXDOP to 2]/ensure: created
-Notice: /Stage[main]/Mssql::Server::Config/Dsc_sqlservermemory[Set Sql Server Memory to 4096]/ensure: created
+Notice: /Stage[main]/Mssql::Server::Config/Dsc_sqlservermemory[Set Sql Server Memory to 8192]/ensure: created
+Notice: /Stage[main]/Mssql::Server::Config/Notify[Processing mssql::server::config]/message: defined 'message' as 'Processing mssql::server::config'
 Notice: /Stage[main]/Mssql::Server::Config/Dsc_firewall[Create SQL Server Firewall Rule]/ensure: created
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '017 - Insufficient Resources' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '017 - Insufficient Resources' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '018 - Nonfatal Internal Error' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '018 - Nonfatal Internal Error' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '019 - Fatal Error in Resource' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '019 - Fatal Error in Resource' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '020 - Fatal Error in Current Process' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '020 - Fatal Error in Current Process' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '021 - Fatal Error in Database Processes' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '021 - Fatal Error in Database Processes' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '022 - Fatal Error: Table Integrity Suspect' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '022 - Fatal Error: Table Integrity Suspect' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '023 - Fatal Error: Database Integrity Suspect' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '023 - Fatal Error: Database Integrity Suspect' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '024 - Fatal Error: Hardware Error' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '024 - Fatal Error: Hardware Error' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '025 - Fatal Error' to 'PeopleSoft Administrator']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '025 - Fatal Error' to 'PeopleSoft Administrator']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSHRPRDDB01]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSHRPRDDB01]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSFSPRDDB01]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSFSPRDDB01]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Credential for domain\psadmin]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Credential for domain\psadmin]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'Powershell' subsystem to 'domain\psadmin' proxy account]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'Powershell' subsystem to 'domain\psadmin' proxy account]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'CmdExec' subsystem to 'domain\psadmin' proxy account]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'CmdExec' subsystem to 'domain\psadmin' proxy account]/returns: executed successfully
 Notice: Applied catalog in 304.53 seconds
 ```
 
@@ -205,14 +302,13 @@ For updates please see the [changelog](https://github.com/umaritimus/mssql/blob/
 
 * Currently this module only works on Microsoft Windows platform.
 * It has been tested with `Microsoft SQL Server 2017` and `Microsoft SQL Server 2019`
+* Linked servers are only implemented for SQL Servers
+* FCI and AG high availability groups have not been fully implemented or tested.
 
 
 ## Upcoming features
 
 * Startup Parameters and Trace Flags
-* Linked Servers
-* Proxy Accounts
-* Agent Configuration
 * Hide sensitive data at `--debug --trace --verbose` (or not, since it may be useful for debugging)
 
 

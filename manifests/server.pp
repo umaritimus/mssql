@@ -14,7 +14,9 @@ class mssql::server (
     contain 'mssql::server::update'
     contain 'mssql::server::config'
 
-    Class['mssql::server::install'] -> Class['mssql::server::update'] -> Class['mssql::server::config']
+    Class['mssql::server::install']
+    -> Class['mssql::server::update']
+    -> Class['mssql::server::config']
 
   } else {
 

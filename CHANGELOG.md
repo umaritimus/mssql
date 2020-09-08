@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.9.7
+
+**Added**
+
+* Administration of Linked Servers
+* Administration of Credentials and Proxies
+* SQL Agent Operators
+* SQL Agent Alerts
+
 ## Release 0.9.6
 
 **Fixed**

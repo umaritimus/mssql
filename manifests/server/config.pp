@@ -96,6 +96,103 @@ class mssql::server::config {
       dsc_enabled => 'True',
     }
 
+    $operators = lookup('mssql.server.sqlagent.operators')
+    if (!empty($operators)) {
+      $operators.each | String $id, Hash $parameters | {
+        dsc_sqlagentoperator { $id :
+          dsc_ensure       => 'present',
+          dsc_servername   => 'localhost',
+          dsc_instancename => lookup('mssql.server.instance.instancename'),
+          dsc_name         => lookup("mssql.server.sqlagent.operators.${id}.name"),
+          dsc_emailaddress => lookup("mssql.server.sqlagent.operators.${id}.email"),
+        }
+      }
+    }
+
+    $alerts = lookup('mssql.server.sqlagent.alerts')
+    if (!empty($alerts)) {
+      $alerts.each | String $id, Hash $parameters | {
+          $aname     = $parameters['name']
+          $anotify   = $parameters['notify']
+          $aseverity = $parameters['severity']
+
+          exec { "Add Alert for '${aname}' to '${anotify}'" :
+            command   => Sensitive("
+                ${file('mssql/mssql.psm1')}
+                New-SqlAgentAlert `
+                  -AlertName \"${aname}\" `
+                  -Operator \"${anotify}\" `
+                  -Severity \"${aseverity}\" `
+                  -Verbose
+              "),
+            provider  => powershell,
+            logoutput => true,
+          }
+      }
+    }
+
+    $linkedservers = lookup('mssql.server.linkedservers')
+
+    if (!empty($linkedservers)) {
+      $linkedservers.each | $linkedservername, $linkedserver | {
+        $lserver      = $linkedserver['server']
+        $ldatabase    = $linkedserver['database']
+        $llogin       = $linkedserver['login']
+        $lpassword    = $linkedserver['password']
+
+        if ($ldatabase != lookup('db_name')) {
+          exec { "Add Linked Server for ${lserver}" :
+            command   => Sensitive("
+                ${file('mssql/mssql.psm1')}
+                New-SqlServerLinkedServer `
+                  -Name \"${lserver}\" `
+                  -Login \"${llogin}\" `
+                  -Password \"${lpassword}\" `
+                  -Verbose
+              "),
+            provider  => powershell,
+            logoutput => true,
+          }
+        }
+      }
+    }
+
+    $credentials = lookup('mssql.server.security.credentials')
+    if (!empty($credentials)) {
+      $credentials.each |  String $name, Hash $parameters | {
+        exec { "Add Credential for ${name}" :
+          command   => Sensitive("
+            ${file('mssql/mssql.psm1')}
+            New-SqlServerCredential `
+              -Username \"${regsubst(lookup("mssql.server.security.credentials.${name}.user") ,'/', '\\', 'G')}\" `
+              -Password \"${lookup("mssql.server.security.credentials.${name}.password")}\" `
+              -Verbose
+            "),
+          provider  => powershell,
+          logoutput => true,
+        }
+      }
+    }
+
+    $proxies = lookup('mssql.server.sqlagent.proxies')
+    if (!empty($proxies)) {
+      $proxies.each |  String $name, Array $subsystems | {
+        $subsystems.each | String $subsystem | {
+          exec { "Register '${subsystem}' subsystem to '${name}' proxy account" :
+            command   => Sensitive("
+              ${file('mssql/mssql.psm1')}
+              New-SqlServerProxy `
+                -Username \"${name}\" `
+                -ProxySubsystem \"${subsystem}\" `
+                -Verbose
+              "),
+            provider  => powershell,
+            logoutput => true,
+          }
+        }
+      }
+    }
+
   } else {
     fail("Unsupported Platform - ${$facts['operatingsystem']}")
   }

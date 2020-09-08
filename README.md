@@ -303,7 +303,7 @@ For updates please see the [changelog](https://github.com/umaritimus/mssql/blob/
 * Currently this module only works on Microsoft Windows platform.
 * It has been tested with `Microsoft SQL Server 2017` and `Microsoft SQL Server 2019`
 * Linked servers are only implemented for SQL Servers
-* FCI and AG high availability groups have not been fully implemented or tested.
+* FCI and AG high availability configurations have not been fully implemented or tested.
 
 
 ## Upcoming features

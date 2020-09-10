@@ -60,7 +60,7 @@ mssql:
       accountname: "%{lookup('psadmin.name')}"
       profilename: "%{lookup('psadmin.name')}"
       address: "%{lookup('psadmin.email')}"
-      replytoaddress: "psadmin@domain.com"
+      replytoaddress: "%{lookup('psadmin.email')}"
       displayname: "%{lookup('psadmin.name')}"
       servername: "smtp.domain.com"
       description:  "%{lookup('psadmin.name')}"
@@ -128,3 +128,13 @@ mssql:
         "%{lookup('psadmin.user')}":
           - 'Powershell'
           - 'CmdExec'
+    startupparameters:
+      'Trace Flag 834':
+        value: '-T834'
+        ensure: 'present'
+      'Trace Flag 1222':
+        value: '-T1222'
+        ensure: 'present'
+      'Trace Flag 3023':
+        value: '-T3023'
+        ensure: 'present'

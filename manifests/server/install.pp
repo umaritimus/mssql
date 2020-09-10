@@ -56,7 +56,76 @@ class mssql::server::install (
     } else {
 
       if (!empty($source)) {
-        dsc_sqlsetup { 'Install SQL Server' :
+
+        if ($instancename == 'MSSQLSERVER') {
+          $sqlsvcaccountusername = lookup({
+            'name'          => 'mssql.server.instance.sqlsvcaccountusername',
+            'default_value' => 'NT Service\\MSSQLSERVER',
+          })
+
+          $agtsvcaccountusername = lookup({
+            'name'          => 'mssql.server.instance.agtsvcaccountusername',
+            'default_value' => 'NT Service\\SQLSERVERAGENT',
+          })
+
+        } else {
+          $sqlsvcaccountusername = lookup({
+            'name'          => 'mssql.server.instance.sqlsvcaccountusername',
+            'default_value' => "NT Service\\MSSQL\$${instancename}",
+          })
+
+          $agtsvcaccountusername = lookup({
+            'name'          => 'mssql.server.instance.agtsvcaccountusername',
+            'default_value' => "NT Service\\SQLAGENT\$${instancename}",
+          })
+        }
+
+        dsc_userrightsassignment { 'Grant SeServiceLogonRight to sqlsvcaccountusername' :
+          dsc_policy   => 'Log_on_as_a_service',
+          dsc_identity => $sqlsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant SeAssignPrimaryTokenPrivilege to sqlsvcaccountusername' :
+          dsc_policy   => 'Replace_a_process_level_token',
+          dsc_identity => $sqlsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant SeChangeNotifyPrivilege to sqlsvcaccountusername' :
+          dsc_policy   => 'Bypass_traverse_checking',
+          dsc_identity => $sqlsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant SeIncreaseQuotaPrivilege to sqlsvcaccountusername' :
+          dsc_policy   => 'Adjust_memory_quotas_for_a_process',
+          dsc_identity => $sqlsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant PerformVolumeMaintenanceTasks to sqlsvcaccountusername' :
+          dsc_policy   => 'Perform_volume_maintenance_tasks',
+          dsc_identity => $sqlsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant LockPagesInMemory to sqlsvcaccountusername' :
+          dsc_policy   => 'Lock_pages_in_memory',
+          dsc_identity => $sqlsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant LogOnAsAService to agtsvcaccountusername' :
+          dsc_policy   => 'Log_on_as_a_service',
+          dsc_identity => $agtsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant SeAssignPrimaryTokenPrivilege to agtsvcaccountusername' :
+          dsc_policy   => 'Replace_a_process_level_token',
+          dsc_identity => $agtsvcaccountusername,
+        }
+
+        -> dsc_userrightsassignment { 'Grant SeIncreaseQuotaPrivilege to agtsvcaccountusername' :
+          dsc_policy   => 'Adjust_memory_quotas_for_a_process',
+          dsc_identity => $agtsvcaccountusername,
+        }
+
+        -> dsc_sqlsetup { 'Install SQL Server' :
           dsc_action                     => lookup({name => 'mssql.server.instance.action',default_value => 'Install',}),
           dsc_sourcepath                 => lookup({name => 'mssql.server.source.install',default_value => undef,}),
           dsc_sourcecredential           => lookup({name => 'mssql.server.instance.sourcecredential',default_value => undef,}),

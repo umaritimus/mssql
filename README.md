@@ -119,7 +119,7 @@ mssql:
       accountname: "%{lookup('psadmin.name')}"
       profilename: "%{lookup('psadmin.name')}"
       address: "%{lookup('psadmin.email')}"
-      replytoaddress: "psadmin@domain.com"
+      replytoaddress: "%{lookup('psadmin.email')}"
       displayname: "%{lookup('psadmin.name')}"
       servername: "smtp.domain.com"
       description:  "%{lookup('psadmin.name')}"
@@ -187,6 +187,16 @@ mssql:
         "%{lookup('psadmin.user')}":
           - 'Powershell'
           - 'CmdExec'
+    startupparameters:
+      'Trace Flag 834':
+        value: '-T834'
+        ensure: 'present'
+      'Trace Flag 1222':
+        value: '-T1222'
+        ensure: 'present'
+      'Trace Flag 3023':
+        value: '-T3023'
+        ensure: 'present'
 
 ```
 
@@ -206,6 +216,8 @@ Notice: Processing mssql::server
 Notice: /Stage[main]/Mssql::Server/Notify[Processing mssql::server]/message: defined 'message' as 'Processing mssql::server'
 Notice: Processing mssql::server::install
 Notice: /Stage[main]/Mssql::Server::Install/Notify[Processing mssql::server::install]/message: defined 'message' as 'Processing mssql::server::install'
+Notice: /Stage[main]/Mssql::Server::Install/Dsc_userrightsassignment[Grant PerformVolumeMaintenanceTasks to sqlsvcaccountusername]/ensure: created
+Notice: /Stage[main]/Mssql::Server::Install/Dsc_userrightsassignment[Grant LockPagesInMemory to sqlsvcaccountusername]/ensure: created
 Notice: /Stage[main]/Mssql::Server::Install/Dsc_sqlsetup[Install SQL Server]/ensure: created
 Notice: Processing mssql::server::update
 Notice: /Stage[main]/Mssql::Server::Update/Notify[Processing mssql::server::update]/message: defined 'message' as 'Processing mssql::server::update'
@@ -251,6 +263,12 @@ Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'Powershell' subsystem 
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'Powershell' subsystem to 'domain\psadmin' proxy account]/returns: executed successfully
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'CmdExec' subsystem to 'domain\psadmin' proxy account]/returns: [output redacted]
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'CmdExec' subsystem to 'domain\psadmin' proxy account]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace Flag 834' is 'present']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace Flag 834' is 'present']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace Flag 1222' is 'present']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace Flag 1222' is 'present']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace Flag 3023' is 'present']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace Flag 3023' is 'present']/returns: executed successfully
 Notice: Applied catalog in 304.53 seconds
 ```
 
@@ -304,12 +322,6 @@ For updates please see the [changelog](https://github.com/umaritimus/mssql/blob/
 * It has been tested with `Microsoft SQL Server 2017` and `Microsoft SQL Server 2019`
 * Linked servers are only implemented for SQL Servers
 * FCI and AG high availability configurations have not been fully implemented or tested.
-
-
-## Upcoming features
-
-* Startup Parameters and Trace Flags
-* Hide sensitive data at `--debug --trace --verbose` (or not, since it may be useful for debugging)
 
 
 ## Development

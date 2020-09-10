@@ -73,7 +73,7 @@ Function New-SqlServerLinkedServer {
 
             Write-Verbose "[${ComputerName}][Complete] Configure SQL Server Linked Server"
         } Catch {
-            Throw "something went wrong during the creation of SQL Server Linked Server"
+            Throw "Something went wrong during the creation of SQL Server Linked Server"
         }
     }
 }
@@ -159,7 +159,7 @@ Function New-SqlServerCredential {
                 Write-Verbose "[${ComputerName}][Skip] $($PSItem.Exception.InnerException.InnerException.InnerException.Message)"
             }
         } Catch {
-            Throw "something went wrong during the creation of SQL Server Credential"
+            Throw "Something went wrong during the creation of SQL Server Credential"
         }
     }
 }
@@ -256,7 +256,7 @@ Function New-SqlServerProxy {
                 Write-Warning "[${ComputerName}][Fail] Add ${ProxySubsystem} subsystem"
             }
         } Catch {
-            Throw "something went wrong during the creation of SQL Server Proxy"
+            Throw "Something went wrong during the creation of SQL Server Proxy"
         }
     }
 }
@@ -327,7 +327,78 @@ Function New-SqlAgentAlert {
                 Write-Verbose "[${ComputerName}][Done] Add email notification"
             }
         } Catch {
-            Throw "something went wrong during the creation of SQL Agent Alert"
+            Throw "Something went wrong during the creation of SQL Agent Alert"
+        }
+    }
+}
+
+Function New-SqlServerStartupParameter {
+    [CmdletBinding()]
+
+    Param (
+        [Parameter(
+            Mandatory = $True,
+            HelpMessage = "Please enter Startup Parameter"
+        )]
+        [String] ${StartupParameter},
+        [Parameter(
+            Mandatory = $True,
+            HelpMessage = "Ensure"
+        )]
+        [String] ${Ensure}
+    )
+
+    Begin {
+        ${ComputerName} = (Get-WmiObject Win32_Computersystem).Name.toLower()
+    }
+
+    Process {
+        Write-Verbose "[${ComputerName}][Goal] Configuring SQL Server Credential"
+        Try {
+            Write-Verbose "[${ComputerName}][Task] Ensure that the services are running"
+            If (-not (Get-Service MSSQLSERVER | Where-Object { $_.Status -eq 'Running' }) ) {
+                Start-Service -Name MSSQLSERVER -ErrorAction Stop | Out-Null
+            }
+            If (-not (Get-Service SQLSERVERAGENT | Where-Object { $_.Status -eq 'Running' }) ) {
+                Start-Service -Name SQLSERVERAGENT -ErrorAction Stop | Out-Null
+            }
+            Write-Verbose "[${ComputerName}][Done] Ensure that the services are running"
+
+            If (-not ${server}) {
+                Write-Verbose "[${ComputerName}][Task] Get default server"
+                [void][Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo")
+                [void][Reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.SqlWmiManagement")
+                $server = New-Object Microsoft.SqlServer.Management.Smo.Server '.'
+                Write-Verbose "[${ComputerName}][Done] Get default server"
+            }
+
+            Write-Verbose "[${ComputerName}][Task] Ensure that Startup Parameter '${StartupParameter}' is '${Ensure}'"
+            ${Computer} = New-Object Microsoft.SqlServer.Management.Smo.Wmi.ManagedComputer $server.ComputerNamePhysicalNetBIOS
+            ${SqlService} = (${Computer}.Services | Where-Object { $_.Type -eq "SqlServer" })
+            ${SqlService}.Refresh()
+            ${CurrentStartupParameters} = ${SqlService}.StartupParameters
+
+            If (${CurrentStartupParameters}.Split(';') -contains ${StartupParameter}) {
+                If (${Ensure} -eq 'present') {
+                    Write-Verbose "[${ComputerName}][Skip] Startup Parameter '${StartupParameter}' is already present"
+                } Else {
+                    ${NewStartupParameters} = ${CurrentStartupParameters}.Remove($CurrentStartupParameters.IndexOf(${StartupParameter}),${StartupParameter}.Length)
+                    ${SqlService}.StartupParameters = ${NewStartupParameters}
+                    ${SqlService}.Alter()
+                    Write-Verbose "[${ComputerName}][Done] Remove Startup Parameter '${StartupParameter}'"
+                }
+            } Else {
+                If (${Ensure} -ne 'present') {
+                    Write-Verbose "[${ComputerName}][Skip] Startup Parameter '${StartupParameter}' is doesn't exist"
+                } Else {
+                    ${NewStartupParameters} = "${CurrentStartupParameters};${StartupParameter}"
+                    ${SqlService}.StartupParameters = ${NewStartupParameters}
+                    ${SqlService}.Alter()
+                    Write-Verbose "[${ComputerName}][Done] Create Startup Parameter '${StartupParameter}'"
+                }
+            }
+        } Catch {
+            Throw "Something went wrong during the creation of SQL Server Startup Parameter"
         }
     }
 }

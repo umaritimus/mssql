@@ -132,7 +132,6 @@ class mssql::server::config {
     }
 
     $linkedservers = lookup('mssql.server.linkedservers')
-
     if (!empty($linkedservers)) {
       $linkedservers.each | $linkedservername, $linkedserver | {
         $lserver      = $linkedserver['server']
@@ -190,6 +189,26 @@ class mssql::server::config {
             logoutput => true,
           }
         }
+      }
+    }
+
+    $startupparameters = lookup('mssql.server.startupparameters')
+    if (!empty($startupparameters)) {
+      $startupparameters.each | String $id, Hash $parameters | {
+          $pvalue     = $parameters['value']
+          $pensure   = $parameters['ensure']
+
+          exec { "Ensure Startup Parameter '${id}' is '${pensure}'" :
+            command   => Sensitive("
+                ${file('mssql/mssql.psm1')}
+                New-SqlServerStartupParameter `
+                  -StartupParameter \"${pvalue}\" `
+                  -Ensure \"${pensure}\" `
+                  -Verbose
+              "),
+            provider  => powershell,
+            logoutput => true,
+          }
       }
     }
 

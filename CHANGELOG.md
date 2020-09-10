@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.9.9
+
+**Added**
+
+* Required user rights assignments for SQL Server and SQL Server Agent accounts
+* Configuration of Startup Parameters
+
+## Release 0.9.8
+
+**Fixed**
+
+* Documentation fixups
+
 ## Release 0.9.7
 
 **Added**

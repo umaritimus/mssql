@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.9.10
+
+**Added**
+
+* SQL Agent properties configuration
+
 ## Release 0.9.9
 
 **Added**

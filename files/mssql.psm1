@@ -332,6 +332,67 @@ Function New-SqlAgentAlert {
     }
 }
 
+
+Function Set-SqlAgentProperty {
+    [CmdletBinding()]
+
+    Param (
+        [Parameter(
+            Mandatory = $True,
+            HelpMessage = "Please enter the SQL Agent Property Name"
+        )]
+        [String] ${PropertyName},
+        [Parameter(
+            Mandatory = $True,
+            HelpMessage = "Please enter the SQL Agent Property Value"
+        )]
+        [String] ${PropertyValue}
+    )
+
+    Begin {
+        ${ComputerName} = (Get-WmiObject Win32_Computersystem).Name.toLower()
+    }
+
+    Process {
+        Write-Verbose "[${ComputerName}][Goal] Configuring SQL Agent Property '${PropertyName}'"
+        Try {
+            Write-Verbose "[${ComputerName}][Task] Ensure that the services are running"
+            If (-not (Get-Service MSSQLSERVER | Where-Object { $_.Status -eq 'Running' }) ) {
+                Start-Service -Name MSSQLSERVER -ErrorAction Stop | Out-Null
+            }
+            If (-not (Get-Service SQLSERVERAGENT | Where-Object { $_.Status -eq 'Running' }) ) {
+                Start-Service -Name SQLSERVERAGENT -ErrorAction Stop | Out-Null
+            }
+            Write-Verbose "[${ComputerName}][Done] Ensure that the services are running"
+
+            If (-not ${server}) {
+                Write-Verbose "[${ComputerName}][Task] Get default server"
+                [void][Reflection.Assembly]::LoadWithPartialName("Microsoft.SqlServer.Smo")
+                [void][Reflection.assembly]::LoadWithPartialName("Microsoft.SqlServer.SqlWmiManagement")
+                $server = New-Object Microsoft.SqlServer.Management.Smo.Server '.'
+                Write-Verbose "[${ComputerName}][Done] Get default server"
+            }
+
+            Write-Verbose "[${ComputerName}][Task] Set Property '${PropertyName}'"
+            ${server}.JobServer.Refresh()
+            ${property} = ${server}.JobServer.Properties | Where-Object Name -like ${PropertyName}
+            If (${property}) {
+                ${property}.Value = ${PropertyValue} -as (${property}.Type -as [Type])
+                Try {
+                    ${server}.JobServer.Alter()
+                } Catch {
+                    Throw "Job Server properties coudn't be saved"
+                }
+                Write-Verbose "[${ComputerName}][Done] Set Property '${PropertyName}'"
+            } Else {
+                Write-Verbose "[${ComputerName}][Skip] No such property defined"
+            }
+        } Catch {
+            Throw "Something went wrong during the creation of SQL Agent Property"
+        }
+    }
+}
+
 Function New-SqlServerStartupParameter {
     [CmdletBinding()]
 

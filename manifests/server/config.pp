@@ -131,6 +131,26 @@ class mssql::server::config {
       }
     }
 
+    $properties = lookup('mssql.server.sqlagent.properties')
+    if (!empty($properties)) {
+      $properties.each | String $id, Hash $parameters | {
+          $pname     = $parameters['name']
+          $pvalue   = $parameters['value']
+
+          exec { "Set SQL Agent Property for '${id}'" :
+            command   => Sensitive("
+                ${file('mssql/mssql.psm1')}
+                Set-SqlAgentProperty `
+                  -PropertyName \"${pname}\" `
+                  -PropertyValue \"${pvalue}\" `
+                  -Verbose
+              "),
+            provider  => powershell,
+            logoutput => true,
+          }
+      }
+    }
+
     $linkedservers = lookup('mssql.server.linkedservers')
     if (!empty($linkedservers)) {
       $linkedservers.each | $linkedservername, $linkedserver | {

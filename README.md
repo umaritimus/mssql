@@ -142,6 +142,16 @@ mssql:
         login:     "%{lookup('fs_linked_username')}"
         password:  "%{lookup('fs_linked_password')}"
     sqlagent:
+      properties:
+        'IsCpuPollingEnabled':
+          name: 'IsCpuPollingEnabled'
+          value: 'True'
+        'MaximumHistoryRows':
+          name: 'MaximumHistoryRows'
+          value: 10000
+        'MaximumJobHistoryRows':
+          name: 'MaximumJobHistoryRows'
+          value: 1000
       operators:
         "%{lookup('psadmin.name')}":
           name: "%{lookup('psadmin.name')}"
@@ -253,10 +263,16 @@ Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '024 - Fatal Error
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '024 - Fatal Error: Hardware Error' to 'PeopleSoft Administrator']/returns: executed successfully
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '025 - Fatal Error' to 'PeopleSoft Administrator']/returns: [output redacted]
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Alert for '025 - Fatal Error' to 'PeopleSoft Administrator']/returns: executed successfully
-Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSHRPRDDB01]/returns: [output redacted]
-Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSHRPRDDB01]/returns: executed successfully
-Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSFSPRDDB01]/returns: [output redacted]
-Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSFSPRDDB01]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Set SQL Agent Property for 'IsCpuPollingEnabled']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Set SQL Agent Property for 'IsCpuPollingEnabled']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Set SQL Agent Property for 'MaximumHistoryRows']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Set SQL Agent Property for 'MaximumHistoryRows']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Set SQL Agent Property for 'MaximumJobHistoryRows']/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Set SQL Agent Property for 'MaximumJobHistoryRows']/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSHRTSTDB01]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSHRTSTDB01]/returns: executed successfully
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSFSTSTDB01]/returns: [output redacted]
+Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Linked Server for PSFSTSTDB01]/returns: executed successfully
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Credential for domain\psadmin]/returns: [output redacted]
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Add Credential for domain\psadmin]/returns: executed successfully
 Notice: /Stage[main]/Mssql::Server::Config/Exec[Register 'Powershell' subsystem to 'domain\psadmin' proxy account]/returns: [output redacted]

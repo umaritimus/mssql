@@ -83,6 +83,16 @@ mssql:
         login:     "%{lookup('fs_linked_username')}"
         password:  "%{lookup('fs_linked_password')}"
     sqlagent:
+      properties:
+        'IsCpuPollingEnabled':
+          name: 'IsCpuPollingEnabled'
+          value: 'True'
+        'MaximumHistoryRows':
+          name: 'MaximumHistoryRows'
+          value: 10000
+        'MaximumJobHistoryRows':
+          name: 'MaximumJobHistoryRows'
+          value: 1000
       operators:
         "%{lookup('psadmin.name')}":
           name: "%{lookup('psadmin.name')}"

@@ -2,30 +2,24 @@
 #
 # @summary Initializes OdbcDriver
 #
-# @param drivername
-# Name of the Microsoft ODBC Driver - has to be exact, hence enumaration
-#
-# @param driversource
-# Location of the downloaded msi installer
-#
-# @param driverensure
-# Standard puppet ensure, e.g. present, absent, installed, etc
-#
 # @example
 #   include mssql::client::odbc
 #
-class mssql::client::odbc (
-  Enum[
-    'ODBC Driver 13 for SQL Server',
-    'ODBC Driver 17 for SQL Server'
-  ] $drivername = 'ODBC Driver 17 for SQL Server',
-  String $driversource = 'c:/temp/msodbcsql_17.3.1.1_x64.msi',
-  String $driverensure = $mssql::client::ensure,
-) {
+class mssql::client::odbc () {
 
-  mssql::client::odbc::driver { $drivername :
-    ensure => $driverensure,
-    driver => $drivername,
-    source => $driversource,
+  $drivers = lookup('mssql.client.odbc.drivers')
+  if (!empty($drivers)) {
+    $drivers.each | String $name, Hash $parameters | {
+      $ensure = lookup("mssql.client.odbc.drivers.'${name}'.ensure")
+      $source = lookup("mssql.client.odbc.drivers.'${name}'.source")
+      $options = lookup("mssql.client.odbc.drivers.'${name}'.options")
+
+      mssql::client::odbc::driver { $name :
+        ensure  => $ensure,
+        driver  => $name,
+        source  => $source,
+        options => $options,
+      }
+    }
   }
 }

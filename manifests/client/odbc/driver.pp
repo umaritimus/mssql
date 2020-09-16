@@ -11,13 +11,17 @@
 # @param source
 # Location of OdbcDriver installation msi
 #
+# @param options
+# Installation Options
+#
 # @example
 #   mssql::client::odbc::driver { 'namevar': }
 #
 define mssql::client::odbc::driver (
-  String $driver = $mssql::client::odbc::drivername,
-  String $ensure = $mssql::client::odbc::driverensure,
-  String $source = $mssql::client::odbc::driversource,
+  Enum['ODBC Driver 13 for SQL Server','ODBC Driver 17 for SQL Server'] $driver,
+  Enum['present','absent'] $ensure,
+  String $source,
+  Array $options,
 ) {
 
   if ($facts['operatingsystem'] == 'windows') {
@@ -25,7 +29,7 @@ define mssql::client::odbc::driver (
     package { "Microsoft ${driver}" :
       ensure          => $ensure,
       source          => $source,
-      install_options => [ { 'ADDLOCAL' => 'All' }, { 'IACCEPTMSODBCSQLLICENSETERMS' => 'YES' } ],
+      install_options => $options,
       provider        => 'windows',
     }
 

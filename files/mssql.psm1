@@ -1,3 +1,49 @@
+${funcDef} = @"
+[DllImport("user32.dll", SetLastError = true, CharSet=CharSet.Auto)]
+
+ public static extern IntPtr SendMessageTimeout (
+    IntPtr     hWnd,
+    uint       msg,
+    UIntPtr    wParam,
+    string     lParam,
+    uint       fuFlags,
+    uint       uTimeout,
+out UIntPtr    lpdwResult
+ );
+"@
+
+Function New-PathVariable {
+    [CmdletBinding()]
+
+    Param (
+        [Parameter(
+            Mandatory = $True,
+            HelpMessage = "Please enter the path to add"
+        )]
+        [String] ${Path}
+    )
+
+    Begin {
+        ${ComputerName} = (Get-WmiObject Win32_Computersystem).Name.toLower()
+    }
+
+    Process {
+        If (${Env:Path} -Split ';' -NotContains "${Path}") {
+            ${Env:Path} += ";"+${Path}
+            [Environment]::SetEnvironmentVariable("Path", ${Env:Path}, [System.EnvironmentVariableTarget]::Machine);
+        }
+
+        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition ${funcDef}
+        ${result} = [uIntPtr]::zero
+        [void][Win32.NativeMethods]::SendMessageTimeout([intPtr]0xFFFF, 0x001A, [UIntPtr]::zero, "Environment", 2, 1000, [ref]${result});
+
+        If (${result} -eq 0) {
+            Throw "Failed to reload environment variables."
+        }
+    }
+}
+
+
 Function New-SqlServerLinkedServer {
     [CmdletBinding()]
 

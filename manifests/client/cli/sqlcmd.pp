@@ -15,9 +15,10 @@
 #   mssql::client::cli::sqlcmd { 'namevar': }
 #
 define mssql::client::cli::sqlcmd(
-  String $package = $mssql::client::cli::cliname,
-  String $ensure = $mssql::client::cli::cliensure,
-  String $source = $mssql::client::cli::clisource,
+  Enum['Microsoft Command Line Utilities 14 for SQL Server','Microsoft Command Line Utilities 15 for SQL Server'] $package,
+  String $ensure,
+  String $source,
+  Array $options,
 ) {
 
   if ($facts['operatingsystem'] == 'windows') {
@@ -25,8 +26,22 @@ define mssql::client::cli::sqlcmd(
     package { $package :
       ensure          => $ensure,
       source          => $source,
-      install_options => [ { 'ADDLOCAL' => 'All' }, { 'IACCEPTMSSQLCMDLNUTILSLICENSETERMS' => 'YES' } ],
+      install_options => $options,
       provider        => 'windows',
+    }
+
+    if ($name == 'Microsoft Command Line Utilities 15 for SQL Server') {
+      exec { "Add '${name}' to Path" :
+        command   => ("
+            ${file('mssql/mssql.psm1')}
+            New-PathVariable `
+              -Path 'C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn' `
+              -Verbose
+          "),
+        provider  => powershell,
+        logoutput => true,
+      }
+
     }
 
   } else {

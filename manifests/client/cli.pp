@@ -2,29 +2,24 @@
 #
 # @summary Initializes SQLCMD
 #
-# @param cliname
-# Name of the Microsoft Command Line Utilities - has to be exact, hence enumaration
-#
-# @param clisource
-# Location of the downloaded msi installer
-#
-# @param cliensure
-# Standard puppet ensure, e.g. present, absent, installed, etc
-#
 # @example
 #   include mssql::client::cli
-class mssql::client::cli (
-  Enum[
-    'Microsoft Command Line Utilities 14 for SQL Server',
-    'Microsoft Command Line Utilities 15 for SQL Server'
-  ] $cliname = 'Microsoft Command Line Utilities 15 for SQL Server',
-  String $clisource = 'c:/temp/MsSqlCmdLnUtils.msi',
-  String $cliensure = $mssql::client::ensure,
-) {
+#
+class mssql::client::cli () {
 
-  mssql::client::cli::sqlcmd { $cliname :
-    ensure  => $cliensure,
-    package => $cliname,
-    source  => $clisource,
+  $cli = lookup('mssql.client.cli')
+  if (!empty($cli)) {
+    $cli.each | String $name, Hash $parameters | {
+      $ensure = lookup("mssql.client.cli.'${name}'.ensure")
+      $source = lookup("mssql.client.cli.'${name}'.source")
+      $options = lookup("mssql.client.cli.'${name}'.options")
+
+      mssql::client::cli::sqlcmd { $name :
+        ensure  => $ensure,
+        package => $name,
+        source  => $source,
+        options => $options,
+      }
+    }
   }
 }

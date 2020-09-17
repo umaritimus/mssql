@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Release 0.9.12
+
+**Added**
+
+* SQL Client enhancements
+
 ## Release 0.9.10
 
 **Added**

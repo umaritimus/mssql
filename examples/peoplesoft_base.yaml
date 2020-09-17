@@ -6,6 +6,31 @@ psadmin:
   email: 'psadmin@domain.com'
 
 mssql:
+  client:
+    odbc:
+      drivers:
+        'ODBC Driver 17 for SQL Server' :
+          ensure: 'present'
+          source: '//share/software/msodbcsql_17.6.1.1_x64.msi'
+          options:
+            - 'ADDLOCAL': 'All'
+            - 'IACCEPTMSODBCSQLLICENSETERMS': 'YES'
+      datasources:
+        'CSTST':
+          platform: '64-bit'
+          dsntype: 'System'
+          drivername:  'ODBC Driver 17 for SQL Server'
+          propertyvalue:
+            - "database=CSTST"
+            - "server=PSCSTSTDB01"
+            - "trusted_connection=Yes"
+    cli:
+      'Microsoft Command Line Utilities 15 for SQL Server':
+        ensure: 'present'
+        source: '//share/software/MsSqlCmdLnUtils_15.0.2000.5_x64.msi'
+        options:
+          - 'ADDLOCAL': 'All'
+          - 'IACCEPTMSSQLCMDLNUTILSLICENSETERMS': 'YES'
   server:
     ensure: 'present'
     source:
@@ -73,12 +98,12 @@ mssql:
           password: "%{lookup('psadmin.password')}"
     linkedservers:
       'HRDB':
-        server:    "%{lookup('hr_database_server')}"
+        server:    'PSHRTSTDB01'
         database:  "HRTST"
         login:     "%{lookup('hr_linked_username')}"
         password:  "%{lookup('hr_linked_password')}"
       'FSDB':
-        server:    "%{lookup('fs_database_server')}"
+        server:    'PSFSTSTDB01'
         database:  "FSTST"
         login:     "%{lookup('fs_linked_username')}"
         password:  "%{lookup('fs_linked_password')}"

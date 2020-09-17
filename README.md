@@ -65,6 +65,31 @@ psadmin:
   email: 'psadmin@domain.com'
 
 mssql:
+  client:
+    odbc:
+      drivers:
+        'ODBC Driver 17 for SQL Server' :
+          ensure: 'present'
+          source: '//share/software/msodbcsql_17.6.1.1_x64.msi'
+          options:
+            - 'ADDLOCAL': 'All'
+            - 'IACCEPTMSODBCSQLLICENSETERMS': 'YES'
+      datasources:
+        'CSTST':
+          platform: '64-bit'
+          dsntype: 'System'
+          drivername:  'ODBC Driver 17 for SQL Server'
+          propertyvalue:
+            - "database=CSTST"
+            - "server=PSCSTSTDB01"
+            - "trusted_connection=Yes"
+    cli:
+      'Microsoft Command Line Utilities 15 for SQL Server':
+        ensure: 'present'
+        source: '//share/software/MsSqlCmdLnUtils_15.0.2000.5_x64.msi'
+        options:
+          - 'ADDLOCAL': 'All'
+          - 'IACCEPTMSSQLCMDLNUTILSLICENSETERMS': 'YES'
   server:
     ensure: 'present'
     source:
@@ -288,33 +313,29 @@ Notice: /Stage[main]/Mssql::Server::Config/Exec[Ensure Startup Parameter 'Trace 
 Notice: Applied catalog in 304.53 seconds
 ```
 
-
-### Example ( Installing client when parameters are defined in hiera ):
-
-```yaml
----
-...
-mssql::client::ensure: 'present'
-mssql::client::odbc::drivername: 'ODBC Driver 17 for SQL Server'
-mssql::client::odbc::driversource: 'c:/temp/msodbcsql_17.3.1.1_x64.msi'
-```
-> _Note:_ The OdbcDriver name needs to be exact, as defined by Microsoft.  If you don't specify the correct name, problems will follow you around, e.g. during DSN creation...
-
-```cmd
-puppet apply -e "include ::mssql::client"
-```
-
-> _Note:_ The SQL Client is only really needed, if not installing SQL Server, as SQL client already contains all client pieces. 
-
 ### Example ( Installing OdbcDriver, when used as defined type ):
 
 ```cmd
 puppet apply -e "mssql::client::odbc::driver { 'ODBC Driver 17 for SQL Server' : ensure => 'present', driver => 'ODBC Driver 17 for SQL Server', source => 'c:/temp/msodbcsql_17.3.1.1_x64.msi',  }"
 ```
+> _Note:_ The OdbcDriver name needs to be exact, as defined by Microsoft.  If you don't specify the correct name, problems will follow you around, e.g. during DSN creation...
+> Also, `Microsoft ODBC Driver 17 for SQL Server` has the prerequisite of `Visual Studio Redistributable Package`, so ensure that it's already installed, e.g.
+>
+>     package { 'Visual Studio Redistributable Package' :
+>       ensure          => installed,
+>       source          => 'c:/temp/vc_redist.x64.exe',
+>       install_options => [ '/quiet'],
+>     }
+
+  package { 'Visual Studio Redistributable Package' :
+    ensure          => installed,
+    source          => lookup('vc_redist_location'),
+    install_options => [ '/quiet'],
+  }
 
 ### Example ( Installing sqlcmd )
 
-> _Note:_ `Microsoft Command Line Utilities for SQL Server` package has a prerequisite of `Microsoft ODBC Driver` and a modern `.NET` libraries to be already installed
+> _Note:_ `Microsoft Command Line Utilities 15 for SQL Server` package has a prerequisite of `Microsoft ODBC Driver` and a modern `.NET` libraries to be already installed
 
 ```cmd
 puppet apply -e "mssql::client::cli::sqlcmd { 'Add sqlcmd' : package => 'Microsoft Command Line Utilities 15 for SQL Server', ensure => 'present', source => 'c:/temp/MsSqlCmdLnUtils.msi', }"
@@ -336,6 +357,8 @@ For updates please see the [changelog](https://github.com/umaritimus/mssql/blob/
 
 * Currently this module only works on Microsoft Windows platform.
 * It has been tested with `Microsoft SQL Server 2017` and `Microsoft SQL Server 2019`
+* Module assumes 1 SQL Server instance per machine, because that is the best practice
+* Only `ODBC Driver 13 for SQL Server` and `ODBC Driver 17 for SQL Server` are supported as SQL Server ODBC drivers
 * Linked servers are only implemented for SQL Servers
 * FCI and AG high availability configurations have not been fully implemented or tested.
 
